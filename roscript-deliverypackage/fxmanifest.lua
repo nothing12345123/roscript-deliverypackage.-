@@ -3,14 +3,14 @@ game 'gta5'
 
 author 'Roscript'
 description 'Roscript'
-version '1.0.0' -- 
+version '1.0.0' 
 
-lua54 'yes'  -- Lua 5.4を有効にする
+lua54 'yes' 
 
 shared_scripts {
     'config.lua',
-    '@ox_lib/init.lua',            -- ox_libの初期化スクリプト
-    'locales/en.lua'                 -- ローカライズファイル
+    '@ox_lib/init.lua',         
+    'locales/en.lua'                 
 }
 
 server_scripts {
@@ -23,5 +23,5 @@ client_scripts {
 }
 
 dependencies {
- 'ox_lib'    -- ox_libライブラリ
+ 'ox_lib'    
 }

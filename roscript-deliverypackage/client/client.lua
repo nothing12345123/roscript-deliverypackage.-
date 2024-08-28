@@ -79,9 +79,17 @@ RegisterNetEvent('postal:client:driveFaggio', function()
 
         -- プレイヤーに車の鍵を渡す
         TriggerEvent('vehiclekeys:client:SetOwner', GetVehicleNumberPlateText(vehicle))
-        QBCore.Functions.Notify(_U('faggio_rented'), 'success')
+        lib.notify({
+            title = 'Faggio Rented',
+            description = _U(''),
+            type = 'success'
+        })
     else
-        QBCore.Functions.Notify(_U('not_enough_money', faggioCost), 'error')
+        lib.notify({
+            title = 'Insufficient Funds',
+            description = _U('not_enough_money', faggioCost),
+            type = 'error'
+        })
     end
 end)
 
@@ -102,32 +110,36 @@ RegisterNetEvent('postal:client:startDelivery', function()
         SetBlipRouteColour(deliveryBlip, 3)
 
         TriggerServerEvent('postal:server:givePackage')
-        QBCore.Functions.Notify(_U('receive_package'), 'success')
-
-        -- Add target zone at delivery location
-        deliveryZone = exports['qb-target']:AddBoxZone("delivery_zone", vector3(currentDeliveryLocation.x, currentDeliveryLocation.y, currentDeliveryLocation.z), 1.0, 1.0, {
-            name = "delivery_zone",
-            heading = currentDeliveryLocation.w,
-            debugPoly = false,
-            minZ = currentDeliveryLocation.z - 1.0,
-            maxZ = currentDeliveryLocation.z + 1.0,
-        }, {
-            options = {
-                {
-                    type = "client",
-                    event = "postal:client:knockDoor",
-                    icon = "fas fa-hand-paper",
-                    label = "Knock on Door",
-                },
-            },
-            distance = 2.0,
+        lib.notify({
+            title = 'Package Received',
+            description = _U('receive_package'),
+            type = 'success'
         })
 
-        -- Spawn recipient NPC at delivery location
-        SpawnRecipientNPC()
-    else
-        QBCore.Functions.Notify(_U('already_have_package'), 'error')
-    end
+-- Add target zone at delivery location
+deliveryZone = exports['qb-target']:AddBoxZone("delivery_zone", vector3(currentDeliveryLocation.x, currentDeliveryLocation.y, currentDeliveryLocation.z), 1.0, 1.0, {
+    name = "delivery_zone",
+    heading = currentDeliveryLocation.w,
+    debugPoly = false,
+    minZ = currentDeliveryLocation.z - 1.0,
+    maxZ = currentDeliveryLocation.z + 1.0,
+}, {
+    options = {
+        {
+            type = "client",
+            event = "postal:client:knockDoor",
+            icon = "fas fa-hand-paper",
+            label = "Knock on Door",
+        },
+    },
+    distance = 2.0,
+})
+
+-- Spawn recipient NPC at delivery location
+SpawnRecipientNPC()
+else
+    lib.notify({ title = 'Error', description = _U('already_have_package'), type = 'error' })
+end
 end)
 
 function SpawnRecipientNPC()
@@ -153,7 +165,7 @@ end
 
 RegisterNetEvent('postal:client:knockDoor', function()
     if not hasPackage then
-        QBCore.Functions.Notify("You have not accepted any delivery yet!", 'error')
+        lib.notify({ title = 'Error', description = "You have not accepted any delivery yet!", type = 'error' })
         return
     end
 
@@ -163,6 +175,8 @@ RegisterNetEvent('postal:client:knockDoor', function()
     LoadAnimDict('timetable@jimmy@doorknock@')
     TaskPlayAnim(ped, 'timetable@jimmy@doorknock@', 'knockdoor_idle', 8.0, -8.0, -1, 1, 0, false, false, false)
     
+    lib.notify({ title = 'Notification', description = "Knocking on the door...", type = 'success' })
+
     QBCore.Functions.Progressbar("knock_door", "Knocking on the door...", 5000, false, true, {
         disableMovement = true,
         disableCarMovement = true,
@@ -173,7 +187,7 @@ RegisterNetEvent('postal:client:knockDoor', function()
         StopAnimTask(ped, 'timetable@jimmy@doorknock@', 'knockdoor_idle', 1.0)
         
         SetEntityVisible(recipientNPC, true, false) -- Make NPC visible
-        QBCore.Functions.Notify("The NPC has come outside.", 'success')
+        lib.notify({ title = 'Notification', description = "The NPC has come outside.", type = 'success' })
 
         -- Remove target zone
         if deliveryZone then
@@ -240,7 +254,7 @@ RegisterNetEvent('postal:client:deliverPackage', function()
             AttachEntityToEntity(boxProp, recipientNPC, GetPedBoneIndex(recipientNPC, 60309), 0.025, 0.08, 0.255, -145.0, 290.0, 0.0, true, true, false, true, 1, true)
 
             TriggerServerEvent('postal:server:receiveReward')
-            QBCore.Functions.Notify(_U('delivery_complete'), 'success')
+            lib.notify({ title = 'Delivery Complete', description = _U('delivery_complete'), type = 'success' })
 
             if deliveryBlip then
                 RemoveBlip(deliveryBlip)
@@ -268,9 +282,24 @@ RegisterNetEvent('postal:client:deliverPackage', function()
                 DeleteObject(boxProp)
                 boxProp = nil
             end
-            QBCore.Functions.Notify(_U('delivery_cancelled'), 'error')
+            lib.notify({ title = 'Delivery Cancelled', description = _U('delivery_cancelled'), type = 'error' })
         end)
     else
-        QBCore.Functions.Notify(_U('no_package'), 'error')
+        lib.notify({ title = 'No Package', description = _U('no_package'), type = 'error' })
     end
 end)
+
+if Config.blipsShow then
+    CreateThread(function()
+        for _,v in pairs(Config.Locations) do
+            local blip = AddBlipForCoord(v.vector)
+            SetBlipSprite(blip, v.sprite)
+            SetBlipScale(blip, v.scale)
+            SetBlipColour(blip, v.color)
+            SetBlipAsShortRange(blip, true)
+            BeginTextCommandSetBlipName("STRING")
+            AddTextComponentString(v.text)
+            EndTextCommandSetBlipName(blip)
+        end
+    end)
+end

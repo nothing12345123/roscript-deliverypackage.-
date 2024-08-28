@@ -1,6 +1,6 @@
 Config = {}
 
-Config.StartLocation = vector4(-554.98, -915.1, 22.88, 266.46) 
+Config.StartLocation = vector4(-554.98, -915.1, 23.88, 266.46) 
 
 Config.DeliveryLocations = {  
     vector3(1241.54, -566.29, 69.66),

@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'Roscript'
-description 'Roscript'
+description 'Roscript Helper -Cams'
 version '1.0.0' 
 
 lua54 'yes' 

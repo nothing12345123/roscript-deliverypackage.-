@@ -1,11 +1,23 @@
 Config = {}
 
-Config.StartLocation = vector4(-554.98, -915.1, 23.88, 266.46) 
+Config.blipsShow = true -- TO NOT HAVE A BLIP CHANGE THIS TO FALSE
+
+Config.Locations = {
+    [1] = {
+        vector = vector3(-554.78, -914.44, 23.88), -- Done 
+        text = "Delivery Job", 
+        color = 2, 
+        sprite = 50, 
+        scale = 0.8,
+    }
+}
+
+Config.StartLocation = vector4(-554.98, -915.1, 22.88, 266.46) 
 
 Config.DeliveryLocations = {  
-    vector3(1241.54, -566.29, 69.66),
-    vector3(980.12, -1050.24, 41.44),
-   
+    vector3(-311.72, 474.93, 111.82),
+    vector3(964.43, -595.96, 59.9),
+    vector3(1437.56, -1492.08, 63.63),
 }
 
 Config.PackageItem = "water_bottle"
